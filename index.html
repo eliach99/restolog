@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EFEAE2">
+<title>Elia's Table</title>
+<!-- ===== SETTINGS: put your Google email in ownerEmail below ===== -->
+<script>
+  window.TABLE_CONFIG = {
+    firebase: {
+      apiKey: "AIzaSyAmcd0d_iQVdl_nKDtDmWJ4_znpygbylUk",
+      authDomain: "restaurant-logger-2fe25.firebaseapp.com",
+      projectId: "restaurant-logger-2fe25",
+      appId: "1:625910837966:web:a460e34ad9ffebc7c6d69f"
+    },
+    ownerEmail: "you@gmail.com"
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Palette */
+  --pearl:#EFEAE2;      /* mother of pearl */
+  --pearl-2:#E6DFD4;
+  --navy:#1E2A45;       /* mystic navy */
+  --copper:#B0683A;     /* copper skillet */
+  --inferno:#A0262B;    /* red inferno */
+  --fir:#34493A;        /* douglas fir */
+
+  --bg:var(--pearl); --surface:#F5F1EB; --ink:var(--navy); --muted:#5D6578; --rule:#CDBFAE;
+  --accent:var(--copper); --good:var(--fir); --bad:var(--inferno);
+  --serif:"EB Garamond", Garamond, "Times New Roman", Georgia, serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#18213A; --surface:#1F2944; --ink:#EFEAE2; --muted:#AEB2BE; --rule:#3D4664;
+    --accent:#D08A5B; --good:#8FB096; --bad:#E0676B; color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:19px/1.55 var(--serif);font-variant-numeric:oldstyle-nums proportional-nums;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:1px solid var(--accent);outline-offset:3px}
+.page{max-width:680px;margin:0 auto;padding:44px 24px 140px}
+.sc{font-variant:all-small-caps;letter-spacing:.14em}
+
+/* Masthead */
+.mast{text-align:center}
+.rule{display:flex;align-items:center;gap:14px;color:var(--accent)}
+.rule::before,.rule::after{content:"";flex:1;border-top:1px solid currentColor;opacity:.7}
+.rule .orn{font-size:13px;line-height:1}
+.mast h1{font-weight:400;font-style:italic;font-size:clamp(52px,13vw,84px);line-height:1;letter-spacing:-.01em;margin:22px 0 12px}
+.mast .tagline{font-style:italic;color:var(--muted);margin:0 0 22px;font-size:19px}
+
+/* Tabs */
+nav.tabs{display:flex;justify-content:center;gap:30px;margin:30px 0 24px}
+.tab{background:none;border:0;padding:4px 2px;cursor:pointer;color:var(--muted);font-size:18px;border-bottom:1px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* Refine */
+.refine{display:grid;gap:12px;margin-bottom:8px}
+.search{width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);padding:8px 2px;font-style:italic;font-size:19px}
+.search::placeholder{color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px}
+.filters select{appearance:none;-webkit-appearance:none;background:transparent;border:0;border-bottom:1px dotted var(--rule);padding:3px 2px;font-size:16px;color:var(--muted);cursor:pointer;font-variant:all-small-caps;letter-spacing:.1em}
+.filters select:hover{color:var(--ink)}
+
+/* Menu list */
+.course{margin-top:38px}
+.course h2{font-weight:500;font-size:18px;text-align:center;margin:0 0 6px;color:var(--accent)}
+.course .count{display:block;text-align:center;font-style:italic;color:var(--muted);font-size:15px;margin-bottom:10px}
+.list{list-style:none;margin:0;padding:0}
+.item{display:block;width:100%;text-align:left;background:none;border:0;padding:12px 0;cursor:pointer}
+.item:hover .iname{color:var(--accent)}
+.line{display:flex;align-items:baseline;gap:8px}
+.iname{font-size:21px;font-weight:500;transition:color .15s}
+.leader{flex:1;border-bottom:1px dotted var(--rule);transform:translateY(-5px);min-width:20px}
+.ival{font-size:21px;color:var(--accent);font-feature-settings:"onum"}
+.ival.none{color:var(--rule)}
+.idesc{font-style:italic;color:var(--muted);font-size:16.5px;margin-top:1px}
+.idesc .closed{color:var(--bad);font-style:normal}
+.empty{text-align:center;font-style:italic;color:var(--muted);padding:40px 0}
+
+/* Buttons */
+.btn{background:var(--navy);color:var(--pearl);border:1px solid var(--navy);border-radius:2px;padding:11px 22px;cursor:pointer;font-size:17px;font-variant:all-small-caps;letter-spacing:.14em}
+.btn.line-btn{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.text{background:none;border:0;padding:6px 2px;color:var(--accent);font-variant:normal;letter-spacing:0;font-style:italic;font-size:17px}
+.btn.danger{color:var(--bad)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn:not(.line-btn):not(.text){background:var(--pearl);color:var(--navy);border-color:var(--pearl)}}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 8px 24px rgba(30,42,69,.22)}
+.fab[hidden]{display:none}
+
+/* Tonight */
+.tonight{text-align:center}
+.tonight h2{font-weight:400;font-style:italic;font-size:34px;margin:6px 0 4px}
+.tonight .lede{color:var(--muted);font-style:italic;margin:0 0 22px}
+.moods{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:18px}
+.mood{background:transparent;border:1px solid var(--rule);border-radius:2px;padding:4px 12px;cursor:pointer;font-size:16px;font-variant:all-small-caps;letter-spacing:.1em;color:var(--muted)}
+.mood[aria-pressed="true"]{border-color:var(--fir);background:var(--fir);color:var(--pearl)}
+.tonight .filters{margin-bottom:24px}
+.card{margin:28px auto 0;max-width:460px;border:1px solid var(--accent);outline:1px solid var(--accent);outline-offset:4px;padding:30px 26px;background:var(--surface)}
+.card .pname{font-style:italic;font-size:clamp(36px,9vw,50px);line-height:1.05;margin:6px 0 10px}
+.card p{margin:0 0 12px;color:var(--muted)}
+.card .order{color:var(--ink)}
+.card .actions{justify-content:center;margin-top:18px}
+
+/* Sheets */
+dialog{max-width:100%;border:0;padding:0;background:var(--bg);color:var(--ink);width:min(600px,100%);max-height:92vh;margin:auto auto 0;border-top:1px solid var(--accent)}
+@media (min-width:700px){dialog{margin:auto;border:1px solid var(--accent);outline:1px solid var(--accent);outline-offset:-6px}}
+dialog::backdrop{background:rgba(24,33,58,.55)}
+.sheet{padding:30px 30px calc(30px + env(safe-area-inset-bottom,0px));overflow:auto;max-height:92vh}
+.close{position:absolute;right:14px;top:10px;background:none;border:0;font-size:28px;color:var(--muted);cursor:pointer;line-height:1;padding:6px}
+.d-head{text-align:center;margin-bottom:18px}
+.d-head .rule{margin:0 34px}
+.d-name{font-style:italic;font-weight:400;font-size:clamp(36px,9vw,50px);line-height:1.05;margin:4px 0 8px}
+.d-meta{color:var(--muted);font-size:16px;margin:0}
+.d-score{text-align:center;color:var(--accent);margin:14px 0 4px}
+.d-score b{font-weight:400;font-size:56px;line-height:1;font-style:italic}
+.d-score span{display:block;font-style:italic;color:var(--muted);font-size:15px}
+.fact{margin:18px 0;text-align:center}
+.fact h4{margin:0 0 2px;font-weight:500;font-size:16px}
+.fact.order h4{color:var(--good)} .fact.skip h4{color:var(--bad)} .fact.notes h4{color:var(--accent)}
+.fact p{margin:0}
+.tags{text-align:center;color:var(--good);font-style:italic;font-size:16px}
+.visits{list-style:none;padding:0;margin:8px 0 22px}
+.visits li{padding:10px 0;border-bottom:1px dotted var(--rule)}
+.visits .vh{display:flex;justify-content:space-between;gap:10px}
+.visits .vh span:last-child{color:var(--accent)}
+.visits .vs{font-size:15px;color:var(--muted);font-style:italic}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.ro{text-align:center;font-style:italic;color:var(--muted);font-size:15px;margin-top:16px}
+
+/* Forms */
+form .f{display:grid;gap:4px;margin-bottom:18px}
+form label,.lbl{font-size:16px;color:var(--muted);font-variant:all-small-caps;letter-spacing:.12em}
+form input[type=text],form input[type=date],form select,form textarea{background:transparent;border:0;border-bottom:1px solid var(--rule);padding:6px 2px;width:100%;font-size:19px;border-radius:0}
+form textarea{min-height:70px;resize:vertical;border:1px solid var(--rule);padding:8px 10px}
+form input:focus,form textarea:focus,form select:focus{outline:none;border-color:var(--accent)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.scale{display:flex;gap:8px}
+.scale button{width:46px;height:46px;border-radius:50%;border:1px solid var(--rule);background:transparent;cursor:pointer;font-size:21px;font-style:italic;color:var(--muted)}
+.scale button[aria-pressed="true"]{background:var(--copper);border-color:var(--copper);color:var(--pearl)}
+.scale.small button{width:36px;height:36px;font-size:17px}
+.sub{display:grid;grid-template-columns:80px 1fr;gap:10px;align-items:center;margin-bottom:8px;font-style:italic;color:var(--muted)}
+details summary{cursor:pointer;color:var(--accent);font-style:italic;margin-bottom:12px}
+.hint{font-style:italic;color:var(--muted);font-size:15px}
+.chiprow{display:flex;flex-wrap:wrap;gap:8px}
+.form-title{text-align:center;font-style:italic;font-weight:400;font-size:34px;margin:0 0 20px}
+
+/* Footer */
+.foot{text-align:center;margin-top:60px;color:var(--muted);font-size:15px}
+.foot .rule{margin-bottom:14px}
+.foot .who{font-style:italic;display:block;margin-bottom:4px}
+.foot .btn.text{font-size:15px;margin:0 8px}
+.import{margin:30px auto 0;text-align:center;border:1px dotted var(--accent);padding:22px;max-width:460px}
+.import p{margin:0 0 12px;font-style:italic}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--pearl);padding:9px 18px;font-style:italic;font-size:16px;opacity:0;pointer-events:none;transition:opacity .2s;border-radius:2px}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:420px){.page{padding:32px 18px 140px} nav.tabs{gap:20px} .sheet{padding:26px 20px calc(26px + env(safe-area-inset-bottom,0px))}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="mast">
+    <div class="rule"><span class="orn">◆</span></div>
+    <h1>Elia's Table</h1>
+    <p class="tagline" id="summary">Setting the table…</p>
+    <div class="rule"><span class="orn">◆</span></div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab sc" role="tab" data-tab="eaten" aria-selected="true">Eaten</button>
+    <button class="tab sc" role="tab" data-tab="wish" aria-selected="false">To try</button>
+    <button class="tab sc" role="tab" data-tab="tonight" aria-selected="false">Tonight</button>
+  </nav>
+
+  <section id="browse">
+    <div class="refine">
+      <input class="search" id="q" type="search" placeholder="Search a place, a dish, a note" aria-label="Search">
+      <div class="filters">
+        <select id="f-area" aria-label="Area"><option value="">Any area</option></select>
+        <select id="f-type" aria-label="Type"><option value="">Any kind</option><option value="restaurant">Restaurants</option><option value="bar">Bars</option><option value="cafe">Cafés</option></select>
+        <select id="f-cost" aria-label="Price"><option value="">Any price</option><option value="1">$</option><option value="2">Up to $$</option><option value="3">Up to $$$</option></select>
+        <select id="f-tag" aria-label="Occasion"><option value="">Any occasion</option></select>
+        <select id="sort" aria-label="Order"><option value="rating">By rating</option><option value="recent">Most recent</option><option value="name">A to Z</option></select>
+      </div>
+    </div>
+    <div id="menu"></div>
+    <div id="import-box"></div>
+  </section>
+
+  <section id="tonight" class="tonight" hidden>
+    <h2>What shall it be tonight?</h2>
+    <p class="lede">Choose a mood, and the list will choose for you.</p>
+    <div class="moods" id="t-moods"></div>
+    <div class="filters">
+      <select id="t-area" aria-label="Area"><option value="">Anywhere</option></select>
+      <select id="t-cost" aria-label="Budget"><option value="">Any budget</option><option value="2">Up to $$</option><option value="3">Up to $$$</option></select>
+      <select id="t-pool" aria-label="Which places"><option value="fav">A favourite</option><option value="new">Somewhere new</option><option value="any">Either</option></select>
+    </div>
+    <button class="btn" id="t-go">Choose for me</button>
+    <div id="t-result"></div>
+  </section>
+
+  <footer class="foot">
+    <div class="rule"><span class="orn">◆</span></div>
+    <span class="who" id="who"></span>
+    <button class="btn text" id="auth-btn" type="button">Sign in to edit</button>
+    <button class="btn text" id="backup" type="button">Download a backup</button>
+  </footer>
+</div>
+
+<button class="btn fab" id="fab" hidden>Log a meal</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog id="d-place"><div class="sheet" id="d-place-body"></div></dialog>
+<dialog id="d-form"><div class="sheet"><form id="form"></form></div></dialog>
+
+<!-- Your places from the original sheet, used once by "Import my places" -->
+<script type="application/json" id="seed">[{"id":"a-la-pier","name":"A la Pier","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Batroun","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"al-beiruti","name":"Al Beiruti","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Lebanese","vibe":"Smart","area":"Downtown","cost":3,"alcohol":false,"tags":[],"mustOrder":"","avoid":"","notes":"Tasty Lebanese food, wide variety, desserts are great.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"aleb","name":"Aleb","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"apetito-trattoria","name":"Apetito Trattoria","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Italian","vibe":"","area":"Beirut","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":1,"note":""}],"rating":1,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"arthaus","name":"Arthaus","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"Mixed","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"atibaia-winery","name":"Atibaia Winery","status":"wishlist","closed":false,"types":["bar"],"cuisine":"Winery","vibe":"","area":"Batroun","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"avanti","name":"Avanti","status":"visited","closed":false,"types":["restaurant"],"cuisine":"","vibe":"","area":"Downtown","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"bar-baker","name":"Bar Baker","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"baron","name":"Baron","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Mar Mkhayel","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"bazalt-beirut","name":"Bazalt Beirut","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"","vibe":"","area":"Achrafieh","cost":4,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"beirut-bowls","name":"Beirut Bowls","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Bowls","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"Portions are decent, average taste. I did not like the idea.","visits":[{"date":null,"overall":2,"note":""}],"rating":2,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"beit-kanz","name":"Beit Kanz","status":"visited","closed":false,"types":["restaurant"],"cuisine":"","vibe":"","area":"Saifi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"big-mike-s","name":"Big Mike's","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"Street","area":"Batroun","cost":2,"alcohol":null,"tags":[],"mustOrder":"Any of the 3 burgers","avoid":"Fries are just average","notes":"Only 3 burger options, meat is perfectly seasoned and juicy, burgers are not too khabsa so you can enjoy the flavors. Fries are average.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"birdy-fam","name":"Birdy Fam","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Fried chicken","vibe":"Snack","area":"Achrafieh","cost":2,"alcohol":null,"tags":["late night","delivery"],"mustOrder":"Chicken strips","avoid":"Sliders","notes":"Fried chicken à l'escalope. Chicken strips are thin, very crispy and tasty. Sauce is good. Perfect for a quick late-night bite or grazing.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"blaze","name":"Blaze","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"bobofou","name":"Bobofou","status":"visited","closed":false,"types":["restaurant"],"cuisine":"","vibe":"Upscale casual","area":"Monot","cost":3,"alcohol":null,"tags":["conversation"],"mustOrder":"","avoid":"","notes":"Good and enjoyable food but nothing exceptional, good prices and very good portions. Not a lot of variety, very safe and conventional with their menu but they do it well. Calm and chill vibes, you can easily dine and have a conversation there.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"boho-bay","name":"Boho Bay","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"bunman","name":"Bunman","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"burger-al-abtal","name":"Burger al Abtal","status":"visited","closed":true,"types":["restaurant"],"cuisine":"Smashed burgers","vibe":"","area":"Mar Mkhayel","cost":1,"alcohol":null,"tags":["quick bite"],"mustOrder":"Dynamite sauce","avoid":"","notes":"Decent burger, good quality vs price ratio, dynamite sauce is really good. Would have it for a regular affordable quick bite.","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"burgero","name":"Burgero","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"","area":"Kaslik","cost":1,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"cafe-amor","name":"Cafe Amor","status":"visited","closed":false,"types":["cafe"],"cuisine":"","vibe":"","area":"Achrafieh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"cali-burger","name":"Cali Burger","status":"wishlist","closed":false,"types":[],"cuisine":"Burgers","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"canaille","name":"Canaille","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"cezanne","name":"Cezanne","status":"visited","closed":false,"types":["restaurant"],"cuisine":"","vibe":"Upscale casual","area":"Dbayeh","cost":3,"alcohol":null,"tags":[],"mustOrder":"Joue de boeuf","avoid":"","notes":"Exceptional food, with a wide variety of options from breakfast to lunch to dinner to desserts. Generous portions, flavorful and indulgent.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"chianina","name":"Chianina","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Rashana","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"chop-suey","name":"Chop Suey","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Chinese","vibe":"","area":"Gemmayzeh","cost":2,"alcohol":null,"tags":["date night","with friends"],"mustOrder":"","avoid":"","notes":"Very good Chinese food, adapted to our taste. Wide variety from appetizers to noodles, rice, chicken, meat and seafood. Portions are decent. Shareable food.","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"corner-54","name":"Corner 54","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"Varied","vibe":"","area":"Achrafieh","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"Steak, and the food in general","notes":"Drinks, aesthetic and ambiance are really nice, the one star is for that. Food is extremely underwhelming: steak was chewy, cold and tasteless for a hefty price. Other items seem promising but are boring and not creative. Would not go again.","visits":[{"date":null,"overall":1,"note":""}],"rating":1,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"couqley","name":"Couqley","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Steaks & French","vibe":"French bistro","area":"Gemmayzeh","cost":3,"alcohol":null,"tags":["date night"],"mustOrder":"Steak with their sauces and fries","avoid":"","notes":"Never-changing quality and taste. Steaks are juicy, tender, flavorful and always cooked to your doneness. All the sauces are good with the fries. Always has specials.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"cyrano-brasserie","name":"Cyrano Brasserie","status":"visited","closed":false,"types":["restaurant","bar","cafe"],"cuisine":"","vibe":"","area":"Naccache","cost":3,"alcohol":null,"tags":["drinks","date night"],"mustOrder":"","avoid":"","notes":"Top tier ambiance and vibes. Drinks are superb. Food is really good, but would not go there for the food only.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"delix","name":"Delix","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Sandwiches","vibe":"Street","area":"","cost":2,"alcohol":null,"tags":["delivery"],"mustOrder":"","avoid":"","notes":"Generous fillings, nice twists and original ingredients and toppings, bread is super good. A bit heavy.","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"di-farina","name":"Di Farina","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Badaro","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"ditto","name":"Ditto","status":"wishlist","closed":true,"types":[],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"drop-sociale","name":"Drop Sociale","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"du-pain","name":"Du Pain","status":"wishlist","closed":false,"types":["cafe"],"cuisine":"","vibe":"","area":"Saifi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"father-and-bun","name":"Father & Bun","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"fine-b","name":"Fine B","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Achrafieh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"futomama","name":"Futomama","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"gilbert-s-burger-bites","name":"Gilbert's Burger Bites","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"Street","area":"Antelias","cost":2,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"Decent patty, but most items are khabsa. Would not visit again due to personal preferences.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"happy-kid","name":"Happy Kid","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"Street","area":"","cost":2,"alcohol":null,"tags":["delivery"],"mustOrder":"","avoid":"","notes":"Tasty simple burgers, more on the fast food side but does it well. Fries and chicken strips are good. Comparable to McDonald's in taste but pushes it further with toppings. Very good prices.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"husk","name":"Husk","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"","area":"Gemmayzeh","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":2,"note":""}],"rating":2,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"in-contro","name":"In Contro","status":"wishlist","closed":false,"types":["cafe"],"cuisine":"","vibe":"","area":"Achrafieh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"inn-sandwich","name":"Inn Sandwich","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"ixsir","name":"Ixsir","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"French","vibe":"","area":"Batroun","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"juicy-grill","name":"Juicy Grill","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"","area":"Jounieh","cost":2,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"julienne","name":"Julienne","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Saifi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"kanu","name":"Kanu","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Poke","vibe":"Casual","area":"Dbayeh","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"Favourite poke in Lebanon, customizable with a wide variety of options, fish is good quality and flavour.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"kiss-the-spoon","name":"Kiss the Spoon","status":"visited","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":null,"note":""}],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"la-burrateria","name":"La Burrateria","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Italian","vibe":"","area":"Gemmayzeh","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"Tiramisu (coffee is overpowering)","notes":"Less than decent Italian dishes, gets creative but fails to satisfy. Pizza dough is good, ingredients not so much. Would not recommend for Italian.","visits":[{"date":null,"overall":2,"note":""}],"rating":2,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"la-masmake","name":"La Masmake","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Kfarabida","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"la-tarterie","name":"La Tarterie","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"laymoon","name":"Laymoon","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Saifi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"le-relais-de-l-entrecote","name":"Le Relais de l'Entrecôte","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Downtown","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"leo-la-terrasse","name":"Leo La Terrasse","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Downtown","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"little-china","name":"Little China","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Chinese","vibe":"","area":"Achrafieh","cost":2,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"lloyd","name":"Lloyd","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"lmatbakh","name":"LMatbakh","status":"wishlist","closed":false,"types":["restaurant"],"cuisine":"","vibe":"","area":"Mar Mkhayel","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"luigi","name":"Luigi","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Italian","vibe":"","area":"Achrafieh","cost":2,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"mailo-s","name":"Mailo's","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"makan","name":"Makan","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"Indian","vibe":"","area":"Mar Mkhayel","cost":2,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"mama-jay","name":"MAMA Jay","status":"visited","closed":false,"types":["restaurant"],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"margherita-mare","name":"Margherita Mare","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Italian","vibe":"","area":"Jounieh","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"marquis-perdu","name":"Marquis Perdu","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"meets-and-bread","name":"Meets and Bread","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"merchak-beirut","name":"Merchak Beirut","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Lebanese","vibe":"Upscale casual","area":"Downtown","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"Lebanese food, good quality and flavors but nothing exceptional. Has arguileh.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"metropole","name":"Metropole","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Downtown","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"mimi","name":"Mimi","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"mitsu-ko","name":"Mitsu-ko","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Japanese","vibe":"","area":"Naccache","cost":4,"alcohol":null,"tags":["date night"],"mustOrder":"Bao buns, salmon, scallops, hand rolls","avoid":"Tuna (still better than elsewhere)","notes":"Mainly Japanese with some Asian influence. Fish is really good, especially salmon and scallops. Hand rolls are tasty, with many options. Expensive.","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"myu","name":"MYU","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"ni","name":"Ni","status":"visited","closed":false,"types":["restaurant"],"cuisine":"International","vibe":"Casual","area":"","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"Horrid in every aspect. Korean chicken burger was tasteless, swiss mushroom was bad and the bun is chewy and feels old. The poke was too small and the salmon tastes like nothing. Sushi was subpar.","visits":[{"date":null,"overall":null,"note":""}],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"odette","name":"Odette","status":"visited","closed":false,"types":["restaurant","bar"],"cuisine":"Mexican","vibe":"Casual","area":"Achrafieh","cost":3,"alcohol":null,"tags":["drinks"],"mustOrder":"Margaritas","avoid":"","notes":"Tacos and quesadillas are good, but I expected better. For drinks and bites it is ideal. Set in an old house, it can get very echo-y when full.","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"oyster","name":"Oyster","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Seafood","vibe":"","area":"Batroun","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"phill-and-will","name":"Phill and Will","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Batroun","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"pizzeria-da-marco","name":"Pizzeria da Marco","status":"wishlist","closed":false,"types":[],"cuisine":"Pizza","vibe":"","area":"Geitawi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"pizzeria-di-marco","name":"Pizzeria di Marco","status":"wishlist","closed":false,"types":[],"cuisine":"Pizza","vibe":"","area":"Sassine","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"salud","name":"Salud","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"seza","name":"Seza","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"superchief","name":"Superchief","status":"wishlist","closed":false,"types":["restaurant"],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"tappo","name":"Tappo","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"the-barn","name":"The Barn","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Breakfast","vibe":"","area":"Gemmayzeh","cost":0,"alcohol":null,"tags":["breakfast"],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"the-daring-italian","name":"The Daring Italian","status":"wishlist","closed":false,"types":[],"cuisine":"Italian","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"the-townhouse","name":"The Townhouse","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"the-wok","name":"The Wok","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Chinese","vibe":"Street","area":"","cost":2,"alcohol":null,"tags":["delivery","night in"],"mustOrder":"Noodles","avoid":"","notes":"Average in everything, good portions though. Noodles are good, rice and meats are average. Very suitable for nights in, when you need to fill that saucy carby craving.","visits":[{"date":null,"overall":3,"note":""}],"rating":3,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"the-wooden-cellar","name":"The Wooden Cellar","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Mar Mkhayel","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"time-etc","name":"Time etc","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"tom-and-mutz","name":"Tom & Mutz","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Italian-American","vibe":"","area":"Mar Mkhayel","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":3,"note":"First visit"},{"date":null,"overall":4,"note":"Second visit"}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"uni","name":"Uni","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"urban-onion","name":"Urban Onion","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Burgers","vibe":"Street","area":"","cost":2,"alcohol":null,"tags":["delivery"],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":4,"note":""}],"rating":4,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"vicoli","name":"Vicoli","status":"wishlist","closed":false,"types":[],"cuisine":"","vibe":"","area":"Saifi","cost":0,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[],"rating":null,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"},{"id":"zaytun","name":"Zaytun","status":"visited","closed":false,"types":["restaurant"],"cuisine":"Seafood","vibe":"","area":"Amchit","cost":3,"alcohol":null,"tags":[],"mustOrder":"","avoid":"","notes":"","visits":[{"date":null,"overall":5,"note":""}],"rating":5,"lastVisit":null,"updatedAt":"2026-10-11T00:00:00Z"}]</script>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+  const CFG = window.TABLE_CONFIG || {};
+  const TAGS = ["date night","with friends","drinks","quick bite","late night","delivery","night in","breakfast","conversation","family"];
+  const TYPE = {restaurant:"Restaurant", bar:"Bar", cafe:"Café"};
+  const COURSES = [[5,"Exceptional"],[4,"Very good"],[3,"Good"],[2,"Disappointing"],[1,"Not again"],[null,"Yet to be rated"]];
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const money = n => n ? "$".repeat(n) : "";
+  const today = () => new Date().toISOString().slice(0,10);
+  const fmtDate = d => d ? new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}) : "Before October 2026";
+  const slug = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || ("p-"+Date.now());
+  const ONES = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+  const TENS = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+  const words = n => n < 20 ? ONES[n] : n < 100 ? TENS[Math.floor(n/10)] + (n%10 ? "-" + ONES[n%10] : "") : String(n);
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  let places = [], db = null, auth = null, user = null, canWrite = false, tab = "eaten", loaded = false;
+
+  function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("on"),2400); }
+
+  /* ---------- Firebase ---------- */
+  function init(){
+    render();
+    if (!window.firebase || !CFG.firebase || CFG.firebase.apiKey === "PASTE"){
+      $("#summary").textContent = "Almost there: add your Firebase settings near the bottom of index.html."; return;
+    }
+    firebase.initializeApp(CFG.firebase);
+    auth = firebase.auth(); db = firebase.firestore();
+    auth.getRedirectResult().catch(()=>{});
+    auth.onAuthStateChanged(u => {
+      user = u;
+      canWrite = !!u && (u.email||"").toLowerCase() === (CFG.ownerEmail||"").toLowerCase();
+      $("#fab").hidden = !canWrite || tab === "tonight";
+      $("#who").textContent = u ? `Signed in as ${u.email}` : "";
+      $("#auth-btn").textContent = u ? "Sign out" : "Sign in to edit";
+      render();
+    });
+    db.collection("places").onSnapshot(snap => {
+      places = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      loaded = true; render();
+    }, () => { $("#summary").textContent = "The list couldn't be reached. Check your connection and the Firestore rules."; });
+  }
+  async function signIn(){
+    const p = new firebase.auth.GoogleAuthProvider();
+    try { await auth.signInWithPopup(p); }
+    catch(e){
+      if (["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/cancelled-popup-request"].includes(e.code)) return auth.signInWithRedirect(p);
+      if (e.code !== "auth/popup-closed-by-user") toast(e.code === "auth/unauthorized-domain" ? "Add this site's address under Firebase Authentication > Settings > Authorized domains." : "Sign-in didn't complete. Try again.");
+    }
+  }
+  async function save(id, data){
+    if (!canWrite) return false;
+    data.updatedAt = new Date().toISOString();
+    try { await db.collection("places").doc(id).set(data); return true; }
+    catch(e){ toast(e.code === "permission-denied" ? "Only the owner's Google account can make changes." : "That didn't save. Check your connection and try again."); return false; }
+  }
+  async function importSeed(){
+    const seed = JSON.parse($("#seed").textContent);
+    const batch = db.batch();
+    seed.forEach(({id, ...d}) => batch.set(db.collection("places").doc(id), {...d, createdAt:new Date().toISOString()}));
+    try { await batch.commit(); toast(`Imported ${seed.length} places`); }
+    catch(e){ toast(e.code === "permission-denied" ? "Only the owner's Google account can import." : "The import didn't finish. Try again."); }
+  }
+  function recompute(p){
+    const vs = p.visits || [];
+    const dated = vs.filter(v=>v.date).map(v=>v.date).sort();
+    p.lastVisit = dated.length ? dated[dated.length-1] : null;
+    const rated = vs.filter(v=>v.overall).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    p.rating = rated.length ? rated[rated.length-1].overall : null;
+    if (vs.length) p.status = "visited";
+    return p;
+  }
+
+  /* ---------- Rendering ---------- */
+  const visited = () => places.filter(p => p.status === "visited");
+  const wish = () => places.filter(p => p.status !== "visited");
+  const areas = () => [...new Set(places.map(p=>p.area).filter(Boolean))].sort();
+  const allTags = () => [...new Set([...TAGS, ...places.flatMap(p=>p.tags||[])])];
+
+  function fill(sel, vals){ const cur=sel.value, first=sel.options[0].outerHTML; sel.innerHTML = first + vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join(""); if([...sel.options].some(o=>o.value===cur)) sel.value=cur; }
+
+  function render(){
+    const v = visited(), w = wish();
+    if (loaded){
+      $("#summary").textContent = places.length ? `${cap(words(v.length))} places eaten, ${words(w.length)} yet to try.` : "An empty table, for now.";
+    }
+    fill($("#f-area"), areas()); fill($("#t-area"), areas()); fill($("#f-tag"), allTags());
+    renderMoods(); renderMenu();
+    $("#import-box").innerHTML = (loaded && !places.length && canWrite) ? `<div class="import"><p>Bring in the ${JSON.parse($("#seed").textContent).length} places from your old sheet.</p><button class="btn" id="do-import">Import my places</button></div>` : "";
+    const ib = $("#do-import"); if (ib) ib.onclick = () => { ib.disabled = true; importSeed(); };
+  }
+
+  function matches(p){
+    const q = $("#q").value.trim().toLowerCase();
+    if (q && ![p.name,p.area,p.cuisine,p.vibe,p.notes,p.mustOrder,p.avoid,(p.tags||[]).join(" "),(p.visits||[]).map(v=>v.note).join(" ")].join(" ").toLowerCase().includes(q)) return false;
+    const a=$("#f-area").value; if (a && p.area!==a) return false;
+    const t=$("#f-type").value; if (t && !(p.types||[]).includes(t)) return false;
+    const c=+$("#f-cost").value; if (c && !(p.cost && p.cost<=c)) return false;
+    const g=$("#f-tag").value; if (g && !(p.tags||[]).includes(g)) return false;
+    return true;
+  }
+  function itemHTML(p, showVal){
+    const desc = [p.cuisine || (p.types||[]).map(t=>TYPE[t]).join(" & "), p.area, money(p.cost)].filter(Boolean).join(", ");
+    const val = showVal ? (p.rating ? `<span class="ival">${p.rating}</span>` : `<span class="ival none">–</span>`) : `<span class="ival">${money(p.cost)}</span>`;
+    return `<li><button class="item" data-id="${esc(p.id)}"><div class="line"><span class="iname">${esc(p.name)}</span><span class="leader"></span>${val}</div>
+      <div class="idesc">${esc(showVal ? desc : [p.cuisine, p.area].filter(Boolean).join(", ")) || "&nbsp;"}${p.closed ? ' <span class="closed sc">closed</span>' : ""}</div></button></li>`;
+  }
+  function renderMenu(){
+    if (tab === "tonight") return;
+    const m = $("#menu");
+    if (!loaded){ m.innerHTML = ""; return; }
+    const base = (tab==="eaten" ? visited() : wish()).filter(matches);
+    const sort = $("#sort").value;
+    const byName = (a,b)=>a.name.localeCompare(b.name);
+    if (!places.length){ m.innerHTML = canWrite ? "" : `<p class="empty">Nothing on the menu yet.</p>`; return; }
+    if (!base.length){ m.innerHTML = `<p class="empty">Nothing matches. Loosen a filter to see more.</p>`; return; }
+    if (tab==="eaten" && sort==="rating"){
+      m.innerHTML = COURSES.map(([r,label]) => {
+        const items = base.filter(p => (p.rating ?? null) === r).sort(byName);
+        if (!items.length) return "";
+        return `<section class="course"><h2 class="sc">${label}</h2><span class="count">${cap(words(items.length))}</span><ul class="list">${items.map(p=>itemHTML(p,true)).join("")}</ul></section>`;
+      }).join("");
+      return;
+    }
+    const sorted = [...base].sort(sort==="recent" ? (a,b)=>(b.lastVisit||b.updatedAt||"").localeCompare(a.lastVisit||a.updatedAt||"") : byName);
+    if (tab==="wish" && sort!=="recent"){
+      // group the list by area, like sections of a menu
+      const groups = {}; sorted.forEach(p => (groups[p.area || "Somewhere"] ||= []).push(p));
+      m.innerHTML = Object.keys(groups).sort((a,b)=> a==="Somewhere" ? 1 : b==="Somewhere" ? -1 : a.localeCompare(b)).map(k =>
+        `<section class="course"><h2 class="sc">${esc(k)}</h2><ul class="list">${groups[k].map(p=>itemHTML(p,false)).join("")}</ul></section>`).join("");
+      return;
+    }
+    m.innerHTML = `<section class="course"><ul class="list">${sorted.map(p=>itemHTML(p, tab==="eaten")).join("")}</ul></section>`;
+  }
+
+  /* ---------- Place card ---------- */
+  function openPlace(id){
+    const p = places.find(x=>x.id===id); if (!p) return;
+    const meta = [p.cuisine, p.area, p.vibe, money(p.cost)].filter(Boolean).join(", ");
+    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||"")+" Lebanon")}`;
+    const vs = [...(p.visits||[])].reverse();
+    const subs = v => ["food","vibe","service","value"].filter(k=>v[k]).map(k=>`${cap(k)} ${v[k]}`).join(", ");
+    $("#d-place-body").innerHTML = `
+      <button class="close" data-close aria-label="Close">×</button>
+      <div class="d-head"><div class="rule"><span class="orn">◆</span></div>
+        <h2 class="d-name">${esc(p.name)}</h2>
+        <p class="d-meta">${esc(meta) || "&nbsp;"}${p.closed ? ` <span class="sc" style="color:var(--bad)">closed</span>` : ""}</p></div>
+      ${p.rating ? `<div class="d-score"><b>${p.rating}</b><span>out of five${vs.length>1 ? `, latest of ${words(vs.length)} visits` : ""}</span></div>` : ""}
+      ${p.mustOrder ? `<div class="fact order"><h4 class="sc">To order</h4><p>${esc(p.mustOrder)}</p></div>` : ""}
+      ${p.avoid ? `<div class="fact skip"><h4 class="sc">To skip</h4><p>${esc(p.avoid)}</p></div>` : ""}
+      ${p.notes ? `<div class="fact notes"><h4 class="sc">Notes</h4><p>${esc(p.notes)}</p></div>` : ""}
+      ${p.alcohol === false ? `<div class="fact"><p><em>No alcohol served.</em></p></div>` : ""}
+      ${(p.tags||[]).length ? `<p class="tags">Good for ${esc(p.tags.join(", "))}</p>` : ""}
+      ${vs.length ? `<div class="rule" style="margin:22px 0 4px"><span class="orn sc" style="font-size:15px">Visits</span></div><ul class="visits">${vs.map(v=>`<li><div class="vh"><span>${fmtDate(v.date)}</span><span>${v.overall ? v.overall : "–"}</span></div>${subs(v)?`<div class="vs">${esc(subs(v))}</div>`:""}${v.note?`<div>${esc(v.note)}</div>`:""}</li>`).join("")}</ul>` : ""}
+      <div class="actions">
+        ${canWrite ? `<button class="btn" data-act="visit">${p.status==="visited" ? "Log another visit" : "I went here"}</button><button class="btn line-btn" data-act="edit">Edit details</button>` : ""}
+        <a class="btn line-btn" href="${maps}" target="_blank" rel="noopener" style="text-decoration:none">Open in Maps</a>
+      </div>
+      ${canWrite ? `<div class="actions" style="margin-top:12px"><button class="btn text danger" data-act="delete">Remove from the list</button></div>` : `<p class="ro">Sign in at the foot of the page to make changes.</p>`}`;
+    $("#d-place-body").onclick = async e => {
+      if (e.target.closest("[data-close]")) return $("#d-place").close();
+      const act = e.target.closest("[data-act]")?.dataset.act; if (!act) return;
+      if (act==="visit"){ $("#d-place").close(); openForm("visit", p); }
+      if (act==="edit"){ $("#d-place").close(); openForm("edit", p); }
+      if (act==="delete"){
+        if (!confirm(`Remove ${p.name} and all its visits? This can't be undone.`)) return;
+        try { await db.collection("places").doc(p.id).delete(); $("#d-place").close(); toast(`Removed ${p.name}`); } catch { toast("That didn't remove. Try again."); }
+      }
+    };
+    $("#d-place").showModal();
+  }
+
+  /* ---------- Forms ---------- */
+  const scale = (name, small) => `<div class="scale${small?" small":""}" data-name="${name}" role="group">${[1,2,3,4,5].map(n=>`<button type="button" data-v="${n}" aria-pressed="false">${n}</button>`).join("")}</div>`;
+  const toggles = (name, opts, sel) => `<div class="chiprow" data-name="${name}">${opts.map(([v,l])=>`<button type="button" class="mood" data-v="${esc(v)}" aria-pressed="${sel.includes(v)}">${esc(l)}</button>`).join("")}</div>`;
+
+  function openForm(mode, place){
+    const p = place || {};
+    const placeFields = mode==="new" || mode==="edit" || mode==="wish";
+    const visitFields = mode==="new" || mode==="visit";
+    const title = {new:"Log a meal", visit:p.name, edit:p.name, wish:"A place to try"}[mode];
+    const f = $("#form");
+    f.innerHTML = `
+      <button type="button" class="close" data-close aria-label="Close">×</button>
+      <h2 class="form-title">${esc(title)}</h2>
+      ${mode==="new" ? `<div class="f"><label for="i-name">Where</label><input id="i-name" type="text" list="names" autocomplete="off" required>
+        <datalist id="names">${places.map(x=>`<option value="${esc(x.name)}">`).join("")}</datalist><span class="hint" id="i-hint">Choose a place you know, or write a new one.</span></div>` : ""}
+      ${mode==="edit"||mode==="wish" ? `<div class="f"><label for="i-name">Name</label><input id="i-name" type="text" required value="${esc(p.name||"")}"></div>` : ""}
+      ${visitFields ? `
+        <div class="f"><span class="lbl">Overall</span>${scale("overall")}</div>
+        <div class="f"><label for="i-date">Date</label><input id="i-date" type="date" value="${today()}"></div>
+        <div class="f"><label for="i-vnote">What stood out</label><textarea id="i-vnote"></textarea></div>
+        <details><summary>Score the food, vibe, service and value</summary>
+          ${["food","vibe","service","value"].map(k=>`<div class="sub"><span>${cap(k)}</span>${scale(k,true)}</div>`).join("")}</details>` : ""}
+      ${placeFields ? `<div id="place-fields" ${mode==="new" ? "hidden" : ""}>
+        <div class="two">
+          <div class="f"><label for="i-area">Area</label><input id="i-area" type="text" list="areas" value="${esc(p.area||"")}"><datalist id="areas">${areas().map(a=>`<option value="${esc(a)}">`).join("")}</datalist></div>
+          <div class="f"><label for="i-cuisine">Cuisine</label><input id="i-cuisine" type="text" value="${esc(p.cuisine||"")}"></div>
+        </div>
+        <div class="two">
+          <div class="f"><label for="i-cost">Price</label><select id="i-cost"><option value="0">Not sure</option>${[1,2,3,4].map(n=>`<option value="${n}" ${p.cost===n?"selected":""}>${money(n)}</option>`).join("")}</select></div>
+          <div class="f"><label for="i-vibe">Vibe</label><input id="i-vibe" type="text" value="${esc(p.vibe||"")}"></div>
+        </div>
+        <div class="f"><span class="lbl">Kind</span>${toggles("types", Object.entries(TYPE), p.types||[])}</div>
+        <div class="f"><span class="lbl">Good for</span>${toggles("tags", allTags().map(t=>[t,t]), p.tags||[])}</div>
+        ${mode!=="wish" ? `<div class="f"><label for="i-order">To order</label><input id="i-order" type="text" value="${esc(p.mustOrder||"")}"></div>
+          <div class="f"><label for="i-avoid">To skip</label><input id="i-avoid" type="text" value="${esc(p.avoid||"")}"></div>` : ""}
+        <div class="f"><label for="i-notes">${mode==="wish" ? "Why it's on the list" : "Notes"}</label><textarea id="i-notes">${esc(p.notes||"")}</textarea></div>
+        ${mode==="edit" ? `<label style="display:flex;gap:10px;align-items:center;margin-bottom:18px;font-variant:normal;letter-spacing:0;font-style:italic"><input type="checkbox" id="i-closed" ${p.closed?"checked":""}> This place has closed</label>` : ""}
+      </div>` : ""}
+      <div class="actions" style="margin-top:10px">
+        <button class="btn" type="submit">${mode==="edit" ? "Save details" : mode==="wish" ? "Add to the list" : "Save the meal"}</button>
+        ${mode==="new" ? `<button class="btn line-btn" type="button" data-wish>Only add to my list</button>` : ""}
+      </div>`;
+
+    f.onclick = e => {
+      if (e.target.closest("[data-close]")) return $("#d-form").close();
+      if (e.target.closest("[data-wish]")){ const n=$("#i-name").value.trim(); $("#d-form").close(); return openForm("wish",{name:n}); }
+      const b = e.target.closest("button[data-v]"); if (!b) return;
+      if (b.parentElement.classList.contains("scale")){
+        const on = b.getAttribute("aria-pressed")==="true";
+        b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+        if (!on) b.setAttribute("aria-pressed","true");
+      } else b.setAttribute("aria-pressed", b.getAttribute("aria-pressed")==="true" ? "false" : "true");
+    };
+    if (mode==="new") $("#i-name").addEventListener("input", () => {
+      const n = $("#i-name").value.trim().toLowerCase(), ex = places.find(x=>x.name.toLowerCase()===n);
+      $("#place-fields").hidden = !n || !!ex;
+      $("#i-hint").textContent = ex ? (ex.status==="visited" ? `A new visit to ${ex.name}.` : `${ex.name} moves from your list to eaten.`) : n ? "A new place. Add a few details below." : "Choose a place you know, or write a new one.";
+    });
+    const one = n => { const b=f.querySelector(`.scale[data-name="${n}"] button[aria-pressed="true"]`); return b ? +b.dataset.v : null; };
+    const many = n => [...f.querySelectorAll(`[data-name="${n}"] button[aria-pressed="true"]`)].map(b=>b.dataset.v);
+    const val = id => f.querySelector("#"+id)?.value.trim() ?? "";
+
+    f.onsubmit = async e => {
+      e.preventDefault();
+      const name = mode==="visit" ? p.name : val("i-name");
+      if (!name) return toast("Add the place's name first.");
+      let t = null, id;
+      const ex = places.find(x=>x.name.toLowerCase()===name.toLowerCase());
+      if (mode==="new" && ex) t = structuredClone(ex);
+      if (mode==="visit"||mode==="edit") t = structuredClone(places.find(x=>x.id===p.id) || p);
+      if (mode==="wish" && ex){ $("#d-form").close(); toast(`${ex.name} is already on your list`); return openPlace(ex.id); }
+      if (!t){ id = slug(name); while (places.some(x=>x.id===id)) id += "-2";
+        t = {name, status:"wishlist", closed:false, types:[], cuisine:"", vibe:"", area:"", cost:0, alcohol:null, tags:[], mustOrder:"", avoid:"", notes:"", visits:[], rating:null, lastVisit:null, createdAt:new Date().toISOString()};
+      } else id = t.id;
+      delete t.id;
+      if (placeFields && !f.querySelector("#place-fields")?.hidden){
+        Object.assign(t, {name, area:val("i-area"), cuisine:val("i-cuisine"), vibe:val("i-vibe"), cost:+val("i-cost")||0, types:many("types"), tags:many("tags"), notes:val("i-notes")});
+        if (f.querySelector("#i-order")) Object.assign(t, {mustOrder:val("i-order"), avoid:val("i-avoid")});
+        if (f.querySelector("#i-closed")) t.closed = f.querySelector("#i-closed").checked;
+      }
+      if (visitFields){
+        const overall = one("overall"); if (!overall) return toast("Give it an overall score first.");
+        const v = {date: val("i-date") || today(), overall, note: val("i-vnote")};
+        ["food","vibe","service","value"].forEach(k=>{ const s=one(k); if (s) v[k]=s; });
+        t.visits = [...(t.visits||[]), v];
+      }
+      recompute(t);
+      const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
+      const ok = await save(id, t); btn.disabled = false;
+      if (ok){ $("#d-form").close(); toast(mode==="edit" ? "Details saved" : mode==="wish" ? `${name} added to your list` : `${name} saved`); }
+    };
+    $("#d-form").showModal();
+  }
+
+  /* ---------- Tonight ---------- */
+  const moods = new Set(); let last = null;
+  function renderMoods(){
+    const used = new Set(places.flatMap(p=>p.tags||[]));
+    $("#t-moods").innerHTML = allTags().filter(t=>used.has(t)).map(t=>`<button class="mood" data-v="${esc(t)}" aria-pressed="${moods.has(t)}">${esc(t)}</button>`).join("");
+  }
+  $("#t-moods").onclick = e => { const b=e.target.closest("button[data-v]"); if(!b) return; const t=b.dataset.v; moods.has(t)?moods.delete(t):moods.add(t); b.setAttribute("aria-pressed", moods.has(t)); };
+  function choose(){
+    const area=$("#t-area").value, cost=+$("#t-cost").value, pool=$("#t-pool").value;
+    let c = places.filter(p=>!p.closed)
+      .filter(p => pool==="fav" ? p.status==="visited" && p.rating>=4 : pool==="new" ? p.status!=="visited" : (p.status!=="visited" || p.rating>=4))
+      .filter(p => !area || p.area===area).filter(p => !cost || (p.cost && p.cost<=cost))
+      .filter(p => [...moods].every(m => (p.tags||[]).includes(m)));
+    if (c.length>1 && last) c = c.filter(p=>p.id!==last);
+    const out = $("#t-result");
+    if (!c.length){ out.innerHTML = `<div class="card"><p style="margin:0">Nothing fits all of that. Set aside a mood, or widen the area.</p></div>`; return; }
+    const w = c.flatMap(p => Array(p.rating===5?3:p.rating===4?2:1).fill(p));
+    const p = w[Math.floor(Math.random()*w.length)]; last = p.id;
+    const why = p.status==="visited" ? `You gave it ${words(p.rating)} out of five${p.area ? ", in " + p.area : ""}.` : `Still waiting on your list${p.area ? ", in " + p.area : ""}.`;
+    out.innerHTML = `<div class="card"><div class="rule"><span class="orn">◆</span></div><div class="pname">${esc(p.name)}</div><p>${esc(why)}</p>
+      ${p.mustOrder ? `<p class="order"><span class="sc" style="color:var(--good)">To order</span> ${esc(p.mustOrder)}</p>` : ""}
+      <div class="actions"><button class="btn" id="t-again">Another</button><button class="btn line-btn" id="t-open">The details</button></div></div>`;
+    $("#t-again").onclick = choose; $("#t-open").onclick = () => openPlace(p.id);
+  }
+  $("#t-go").onclick = choose;
+
+  /* ---------- Wiring ---------- */
+  document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+    tab = b.dataset.tab;
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===b));
+    $("#browse").hidden = tab==="tonight"; $("#tonight").hidden = tab!=="tonight";
+    $("#fab").hidden = !canWrite || tab==="tonight";
+    $("#fab").textContent = tab==="wish" ? "Add a place" : "Log a meal";
+    renderMenu();
+  });
+  ["#q","#f-area","#f-type","#f-cost","#f-tag","#sort"].forEach(s => $(s).addEventListener("input", renderMenu));
+  $("#menu").onclick = e => { const i=e.target.closest(".item"); if (i) openPlace(i.dataset.id); };
+  $("#fab").onclick = () => openForm(tab==="wish" ? "wish" : "new");
+  document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => { if (e.target===d) d.close(); }));
+  $("#auth-btn").onclick = () => { if (!auth) return toast("Add your Firebase settings first."); user ? auth.signOut().then(()=>toast("Signed out")) : signIn(); };
+  $("#backup").onclick = () => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(places,null,2)],{type:"application/json"}));
+    a.download = `elias-table-backup-${today()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  };
+  init();
+})();
+</script>
+</body>
+</html>
